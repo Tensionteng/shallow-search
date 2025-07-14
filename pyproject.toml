@@ -1,87 +1,61 @@
-# -------------------------------
-# build-system
-# -------------------------------
-[build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
-
-# -------------------------------
-# project (PEP 621 metadata)
-# -------------------------------
 [project]
-name = "rl_factory"
-# We'll mark the version as "dynamic" because it's read from the file "verl/version/version" 
-# (PEP 621 calls this "dynamic version"). 
-# The actual version is specified in the [tool.setuptools.dynamic] section below.
-dynamic = ["version", "dependencies", "optional-dependencies", "authors", "urls"]
-
-description = "verl: Volcano Engine Reinforcement Learning for LLM"
-license = {file = "LICENSE"}  # or "Apache-2.0", if you prefer an SPDX identifier
-readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.8"
-
-# -------------------------------
-# tool.ruff - Linting configuration
-# -------------------------------
-[tool.ruff]
-# Note: While the formatter will attempt to format lines such that they remain within the line-length,
-# it isn't a hard upper bound, and formatted lines may exceed the line-length.
-line-length = 300 # TODO: Reduce this to a more reasonable value
-
-[tool.ruff.lint]
-isort = {known-first-party = ["verl"]}
-# c.f. https://github.com/vllm-project/vllm/blob/ce8d6b75fc0586045df75ee1568a5b5f9957251b/pyproject.toml
-select = [
-    # pycodestyle
-    "E",
-    # Pyflakes
-    "F",
-    # pyupgrade
-    "UP",
-    # flake8-bugbear
-    "B",
-    # isort
-    "I",
-    "G",
+name = "qwen-rl"
+version = "0.1.0"
+description = "post train qwen3 4B/0.6B with veRl based on DAPO as a deep researcher"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "accelerate>=1.8.1",
+    "beautifulsoup4>=4.13.4",
+    "codetiming>=1.4.0",
+    "datasets>=3.6.0",
+    "dill>=0.3.8",
+    "fastapi[standard]>=0.115.0",
+    "fastmcp>=2.10.5",
+    "flash-attn",
+    "flashinfer-python>=0.2.7.post1",
+    "grpcio>=1.62.1",
+    "hf-transfer>=0.1.9",
+    "hydra-core>=1.3.2",
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.7",
+    "liger-kernel>=0.5.10",
+    "mathruler>=0.1.0",
+    "modelscope>=1.28.0",
+    "numpy<2.0.0",
+    "nvidia-ml-py>=12.560.30",
+    "opencv-fixer>=0.2.5",
+    "opencv-python>=4.11.0.86",
+    "optree>=0.13.0",
+    "pandas>=2.3.0",
+    "peft>=0.15.2",
+    "pre-commit>=4.2.0",
+    "py-spy>=0.4.0",
+    "pyarrow>=15.0.0",
+    "pybind11>=2.13.6",
+    "pydantic>=2.9",
+    "pyext>=0.7",
+    "pylatexenc>=2.10",
+    "pymilvus>=2.5.12",
+    "pytest>=8.4.1",
+    "python-dotenv>=1.1.1",
+    "qwen-agent>=0.0.27",
+    "qwen-vl-utils>=0.0.11",
+    "ray[default]>=2.47.1",
+    "ruff>=0.12.1",
+    "sentence-transformers>=5.0.0",
+    "tensordict>=0.6.2",
+    "torch==2.6.0",
+    "torch-memory-saver>=0.0.8",
+    "torchaudio==2.6.0",
+    "torchdata>=0.11.0",
+    "torchvision==0.21.0",
+    "transformers[hf-xet]>=4.51.0",
+    "verl",
+    "vllm==0.8.5.post1",
+    "wandb>=0.21.0",
 ]
-ignore = [
-    # star imports
-    "F405", "F403",
-    # lambda expression assignment
-    "E731",
-    # Loop control variable not used within loop body
-    "B007",
-    # f-string format
-    "UP032",
-    # Can remove once 3.10+ is the minimum Python version
-    "UP007",
-    # `.log()` statement uses f-string
-    "G004",
-]
 
-# -------------------------------
-# tool.setuptools - Additional config
-# -------------------------------
-[tool.setuptools]
-# True means `setuptools` will attempt to include all relevant files in package_data automatically.
-# This corresponds to `include_package_data=True` in setup.py.
-include-package-data = true
-
-# We read the version from a file in 'verl/version/version'
-[tool.setuptools.dynamic]
-version = {file = "verl/version/version"}
-
-# If you need to mimic `package_dir={'': '.'}`:
-[tool.setuptools.package-dir]
-"" = "."
-
-# If you need to include specific non-Python data (like YAML files or version file):
-# This is the rough equivalent of package_data={'': ['version/*'], 'verl': ['trainer/config/*.yaml']}
-[tool.setuptools.package-data]
-verl = [
-  "version/*",
-  "trainer/config/*.yaml"
-]
+[tool.uv.sources]
+# flash-attn = { path = "flash_attn-2.7.4.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl" }
+verl = { path = "verl", editable = true }

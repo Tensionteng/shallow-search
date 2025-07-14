@@ -1,3 +1,5 @@
+# Copyright 2024 Bytedance Ltd. and/or its affiliates
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,7 +20,7 @@ from setuptools import find_packages, setup
 
 version_folder = os.path.dirname(os.path.join(os.path.abspath(__file__)))
 
-with open(os.path.join(version_folder, "verl/version/version")) as f:
+with open(os.path.join(version_folder, "version/version")) as f:
     __version__ = f.read().strip()
 
 install_requires = [
@@ -43,15 +45,18 @@ install_requires = [
 
 TEST_REQUIRES = ["pytest", "pre-commit", "py-spy"]
 PRIME_REQUIRES = ["pyext"]
-GEO_REQUIRES = ["mathruler"]
+GEO_REQUIRES = ["mathruler", "torchvision", "qwen_vl_utils"]
 GPU_REQUIRES = ["liger-kernel", "flash-attn"]
 MATH_REQUIRES = ["math-verify"]  # Add math-verify as an optional dependency
 VLLM_REQUIRES = ["tensordict<=0.6.2", "vllm<=0.8.5"]
 SGLANG_REQUIRES = [
     "tensordict<=0.6.2",
-    "sglang[srt,openai]==0.4.6.post1",
+    "sglang[srt,openai]==0.4.6.post5",
     "torch-memory-saver>=0.0.5",
+    "torch==2.6.0",
 ]
+TRL_REQUIRES = ["trl<=0.9.6"]
+MCORE_REQUIRES = ["mbridge"]
 
 extras_require = {
     "test": TEST_REQUIRES,
@@ -61,6 +66,8 @@ extras_require = {
     "math": MATH_REQUIRES,
     "vllm": VLLM_REQUIRES,
     "sglang": SGLANG_REQUIRES,
+    "trl": TRL_REQUIRES,
+    "mcore": MCORE_REQUIRES,
 }
 
 
@@ -68,7 +75,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setup(
-    name="rl_factory",
+    name="verl",
     version=__version__,
     package_dir={"": "."},
     packages=find_packages(where="."),

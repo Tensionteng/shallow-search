@@ -130,3 +130,7 @@ tensorboard_log
 ckpt
 
 .hopeignore
+
+models/
+
+datasets/

@@ -1,0 +1,90 @@
+ray_init:
+  num_cpus: 64
+  num_gpus: 4
+
+algorithm:
+  adv_estimator: vapo
+  use_kl_in_reward: false
+  kl_ctrl:
+    kl_coef: 0.001
+
+data:
+  train_files: datasets/Musique_RL/train.parquet
+  val_files: datasets/Musique_RL/test.parquet
+  train_batch_size: 8
+  max_prompt_length: 4096
+  max_response_length: 512
+
+actor_rollout_ref:
+  # hybrid_engine: true
+  model:
+    path: ./models/Qwen3-4B
+    use_remove_padding: true
+    enable_gradient_checkpointing: true
+  actor:
+    strategy: fsdp
+    optim:
+      lr: 1e-6
+    ppo_mini_batch_size: 8
+    ppo_micro_batch_size_per_gpu: 4
+    use_kl_loss: true
+    kl_loss_coef: 0.001
+    kl_loss_type: low_var_kl
+    fsdp_config:
+      model_dtype: bfloat16
+      param_offload: true
+      optimizer_offload: true
+    state_masking: true
+  rollout:
+    log_prob_micro_batch_size_per_gpu: 4
+    tensor_model_parallel_size: 1
+    name: vllm
+    gpu_memory_utilization: 0.7
+    n: 4
+    max_turns: 2
+    enforce_eager: false
+    free_cache_engine: false
+    mode: async
+  ref:
+    log_prob_micro_batch_size_per_gpu: 4
+    fsdp_config:
+      param_offload: false
+  env:
+    name: search
+    mcp_mode: stdio
+    tool_manager: qwen3
+    enable_thinking: false
+    config_path: envs/configs/mcp_tools.pydata
+    use_process_reward: false
+    model_type: qwen3
+    enable_limiter: true
+
+reward_rollout:
+  if_use_reward_rollout: false
+  rollout:
+    tensor_model_parallel_size: 4
+    gpu_memory_utilization: 0.65
+    model_name: ./models/Qwen3-4B
+    free_cache_engine: false
+    response_length: 2048
+
+reward_model:
+  enable: false
+  reward_manager: parallel
+
+critic:
+  strategy: fsdp
+
+trainer:
+  critic_warmup: 0
+  logger: ["console", "swanlab"]
+  project_name: DAPO_search
+  experiment_name: search_without_thinking
+  n_gpus_per_node: 4
+  nnodes: 1
+  val_before_train: false
+  default_local_dir: ./dapo_result_dir
+  default_hdfs_dir: null
+  save_freq: 20
+  test_freq: 10
+  total_epochs: 2
