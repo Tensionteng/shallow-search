@@ -9,8 +9,6 @@ from typing import Dict, Union
 from rag_schemas import SearchRequest, ScrapeRequest, SearchResult, ScrapeResult
 from rag_config import RAGConfig
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"  # 指定使用的GPU设备
-
 load_dotenv()
 
 

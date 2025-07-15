@@ -23,14 +23,14 @@ python3 -m verl.trainer.main_ppo\
     actor_rollout_ref.actor.use_kl_loss=True\
     actor_rollout_ref.actor.kl_loss_coef=0.001\
     actor_rollout_ref.actor.kl_loss_type=low_var_kl\
-    actor_rollout_ref.actor.fsdp_config.param_offload=False\
+    actor_rollout_ref.actor.fsdp_config.param_offload=True\
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=False\
     actor_rollout_ref.actor.state_masking=True\
     actor_rollout_ref.rollout.dtype=float16\
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4\
     actor_rollout_ref.rollout.tensor_model_parallel_size=1\
     actor_rollout_ref.rollout.name=vllm\
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.8\
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.5\
     actor_rollout_ref.rollout.n=4\
     actor_rollout_ref.rollout.max_turns=2\
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=4\
@@ -45,7 +45,7 @@ python3 -m verl.trainer.main_ppo\
     actor_rollout_ref.env.use_process_reward=False\
     reward_rollout.if_use_reward_rollout=False\
     reward_rollout.rollout.tensor_model_parallel_size=4\
-    reward_rollout.rollout.gpu_memory_utilization=0.8\
+    reward_rollout.rollout.gpu_memory_utilization=0.5\
     reward_rollout.rollout.model_name=$REWARD_MODEL_PATH\
     reward_rollout.rollout.free_cache_engine=False\
     reward_rollout.rollout.response_length=2048\
@@ -62,4 +62,4 @@ python3 -m verl.trainer.main_ppo\
     trainer.default_hdfs_dir=null\
     trainer.save_freq=20\
     trainer.test_freq=10\
-    trainer.total_epochs=2 $@ 2>&1 | tee dapo.log
+    trainer.total_epochs=1 $@ 2>&1 | tee dapo.log

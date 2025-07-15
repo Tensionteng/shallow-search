@@ -25,6 +25,11 @@ pipx install uv
 - Qwen3-4B
 - Qwen3-Embedding-0.6B
 - Qwen3-Reranker-0.6B-seq-cls（这是sentence-transform的特供版，使用起来比较方便）
+```
+modelscope download --model Qwen/Qwen3-4B --local_dir ./models/Qwen3-4B
+modelscope download --model Qwen/Qwen3-Embedding-0.6B --local_dir ./models/Qwen3-Embedding-0.6B
+modelscope download --model dengcao/Qwen3-Reranker-0.6B-seq-cls --local_dir ./models/Qwen3-Reranker-0.6B-seq-cls
+```
 
 # 保姆级教程
 还没开始写，写完发知乎

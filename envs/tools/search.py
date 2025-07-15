@@ -2,7 +2,7 @@ import requests
 from mcp.server.fastmcp import FastMCP  # 假设您已有这个基础库
 
 mcp = FastMCP("LocalServer")
-
+RAG_ADRESS = "10.10.100.82:8000"  # RAG服务地址
 
 @mcp.tool()
 def query_rag(query: str, topk: int = 50):
@@ -24,7 +24,7 @@ def query_rag(query: str, topk: int = 50):
         proxies = {"http": None, "https": None}
 
         response = requests.post(
-            "http://127.0.0.1:8000/retrieve",
+            f"http://{RAG_ADRESS}/retrieve",
             json=request_data,
             headers=headers,
             proxies=proxies,
@@ -69,7 +69,7 @@ def scrape_rag(id: str):
         proxies = {"http": None, "https": None}
 
         response = requests.post(
-            "http://127.0.0.1:8000/scrape",
+            f"http://{RAG_ADRESS}/scrape",
             json=request_data,
             headers=headers,
             proxies=proxies,
