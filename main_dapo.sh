@@ -5,8 +5,8 @@ set -e -x
 
 export MODEL_PATH=./models/Qwen3-4B
 export REWARD_MODEL_PATH=./models/Qwen3-4B
-export RESULT_DIR=./dapo_result_dir
-export CUDA_VISIBLE_DEVICES=0,1,2
+export RESULT_DIR=dapo_result_dir
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 python3 -m verl.trainer.main_ppo\
     algorithm.adv_estimator=grpo\
     data.train_files=datasets/Musique_RL/train.parquet\
@@ -23,8 +23,8 @@ python3 -m verl.trainer.main_ppo\
     actor_rollout_ref.actor.use_kl_loss=True\
     actor_rollout_ref.actor.kl_loss_coef=0.001\
     actor_rollout_ref.actor.kl_loss_type=low_var_kl\
-    actor_rollout_ref.actor.fsdp_config.param_offload=True\
-    actor_rollout_ref.actor.fsdp_config.optimizer_offload=True\
+    actor_rollout_ref.actor.fsdp_config.param_offload=False\
+    actor_rollout_ref.actor.fsdp_config.optimizer_offload=False\
     actor_rollout_ref.actor.state_masking=True\
     actor_rollout_ref.rollout.dtype=float16\
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4\

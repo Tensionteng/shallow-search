@@ -133,4 +133,5 @@ ckpt
 
 models/
 
-datasets/
+datasets/*
+!datasets/download_datasets.ipynb

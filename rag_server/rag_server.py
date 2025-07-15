@@ -64,7 +64,7 @@ async def lifespan(app: FastAPI):
             "torch_dtype": torch.bfloat16,
         },
         tokenizer_kwargs={"padding_side": "left"},
-        device="cuda",
+        device="cuda:4",
     )
 
     # 加载用于重排序的Cross-Encoder模型
@@ -78,7 +78,7 @@ async def lifespan(app: FastAPI):
         tokenizer_kwargs={
             "padding_side": "left",
         },
-        device="cuda",
+        device="cuda:4",
     )
     # 在这里可以添加其他初始化逻辑
     yield  # 应用运行时保持活跃

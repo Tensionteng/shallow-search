@@ -44,6 +44,7 @@ dependencies = [
     "ray[default]>=2.47.1",
     "ruff>=0.12.1",
     "sentence-transformers>=5.0.0",
+    "swanlab>=0.6.6",
     "tensordict>=0.6.2",
     "torch==2.6.0",
     "torch-memory-saver>=0.0.8",
