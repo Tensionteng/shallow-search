@@ -58,8 +58,8 @@ async def lifespan(app: FastAPI):
         f"Qwen/{config.embedding_model_name}",
         cache_folder=f"{config.cache_dir}/{config.embedding_model_name}",
         model_kwargs={
-            "attn_implementation": "flash_attention_2",
-            "torch_dtype": torch.bfloat16,
+            # "attn_implementation": "flash_attention_2",
+            # "torch_dtype": torch.bfloat16,
         },
         tokenizer_kwargs={"padding_side": "left"},
         device="cuda:4",
@@ -70,8 +70,8 @@ async def lifespan(app: FastAPI):
         f"tomaarsen/{config.reranker_model_name}",
         cache_folder=f"{config.cache_dir}/{config.reranker_model_name}",
         model_kwargs={
-            "attn_implementation": "flash_attention_2",
-            "torch_dtype": torch.bfloat16,
+            # "attn_implementation": "flash_attention_2",
+            # "torch_dtype": torch.bfloat16,
         },
         tokenizer_kwargs={
             "padding_side": "left",
@@ -91,15 +91,16 @@ app = FastAPI(
 )
 
 
-@app.post("/retrieve", response_model=list[SearchResult], summary="模拟搜索引擎")
+@app.post("/retrieve", response_model=list[list[SearchResult]], summary="模拟搜索引擎")
 async def web_search(request: SearchRequest):
     """
     接收一个查询，执行两阶段检索（向量检索+重排序），返回最相关的文档片段。
     """
     # **向量检索 (Dense Retrieval)**
     # 为查询生成向量
-    if isinstance(request.queries, str):
-        query_list = [request.queries]
+    query_list = request.query if isinstance(request.query, list) else [request.query]
+    if request.top_k:
+        config.top_k_retrieval = request.top_k
     query_vector = ml_models["embedding_model"].encode_query(
         query_list, normalize_embeddings=True
     )
@@ -131,16 +132,16 @@ async def web_search(request: SearchRequest):
                         "text": hit["entity"]["text"],
                     }
                 )
-        unique_docs.append(unique_docs)
+        unique_docs.append(temp)
 
-    # 如果没有找到独特的文档，直接返回空列表
+    # 如果没有找到文档，直接返回空列表
     if not unique_docs:
         return []
 
     query_for_reranker = [format_queries(query, TASK) for query in query_list]
-    documents_for_reranker = [
-        format_document(doc["text"]) for docs in unique_docs for doc in docs
-    ]
+    documents_for_reranker = []
+    for docs in unique_docs:
+        documents_for_reranker.append(format_document(doc["text"]) for doc in docs)
 
     # **重排序 (Reranking)
     # 使用Cross-Encoder模型计算相关性分数
@@ -152,9 +153,8 @@ async def web_search(request: SearchRequest):
         for query, doc in zip(query_for_reranker, documents_for_reranker)
     ]
 
-    # 格式化并返回最终结果
     final_results = []
-    for rank in ranks:
+    for index, rank in enumerate(ranks):
         temp = []
         # 只处理分数最高的TOP_K_RERANKED个结果
         for rank_info in rank[: config.top_k_rerank]:
@@ -162,7 +162,7 @@ async def web_search(request: SearchRequest):
             corpus_id = rank_info["corpus_id"]
 
             # 从我们保存的原始文档列表中获取完整信息
-            original_doc = unique_docs[corpus_id]
+            original_doc = unique_docs[index][corpus_id]
 
             # 构建最终返回的SearchResult对象
             temp.append(
@@ -179,15 +179,15 @@ async def web_search(request: SearchRequest):
     return final_results
 
 
-@app.post("/scrape", response_model=ScrapeResult, summary="模拟网页抓取")
+@app.post("/scrape", response_model=list[ScrapeResult], summary="模拟网页抓取")
 async def scrape_document(request: ScrapeRequest):
     """
     根据文档ID，返回该文档的完整内容。
     """
-    doc_id = request.doc_id
+    doc_id = request.id if isinstance(request.id, list) else [request.id]
     results = client.query(
         collection_name=config.milvus_collection_name,
-        ids=[doc_id],
+        ids=doc_id,
         output_fields=["text", "title"],
     )
     if not results:
@@ -195,8 +195,7 @@ async def scrape_document(request: ScrapeRequest):
         raise HTTPException(
             status_code=404, detail=f"文档ID {doc_id} 在数据库中未找到。"
         )
-    doc = results[0]
-    return ScrapeResult(id=doc_id, title=doc["title"], full_text=doc["text"])
+    return [ScrapeResult(id=doc["id"], title=doc["title"], full_text=doc["text"]) for doc in results]
 
 
 @app.get("/", summary="服务状态检查")

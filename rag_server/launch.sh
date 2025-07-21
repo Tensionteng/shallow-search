@@ -1,1 +1,1 @@
-python rag_server/rag_server.py
+python rag_server/rag_server.py 2>&1 | tee rag_server.log

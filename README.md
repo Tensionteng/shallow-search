@@ -7,6 +7,13 @@
 git clone https://github.com/Tensionteng/shallow-search.git && cd shallow-search
 
 uv sync
+
+wget https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+
+wget https://github.com/flashinfer-ai/flashinfer/releases/tag/v0.2.2.post1
+
+uv add flash_attn --no-build-isolation
+uv add flashinfer-python --no-build-isolation
 ```
 如果未安装uv
 ```
